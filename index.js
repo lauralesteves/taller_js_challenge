@@ -50,34 +50,18 @@ function licenseKeyFormatting1(license, groupSize) {
 }
 
 function licenseKeyFormatting2(license, groupSize) {
-    const splitByDash = license.split('-')
-    let result = splitByDash[0]
+    const cleaned = license.replace(/-/g, '').toUpperCase()
+    const firstGroupLength = cleaned.length % groupSize || groupSize
 
-    return splitByDash.reduce((all, current, index) => {
-        if (index === 0 || current.length > groupSize) {
-            return all.concat(current)
-        }
+    const regex = new RegExp(`.{1,${groupSize}}`, 'g')
 
-        const last = all[index-1]
-        const next = last + current
-        if (next.length > groupSize) {
-            let leftover = next.substring(groupSize)
-            let result = all
-
-            while (leftover.length > groupSize) {
-                result = result.concat(next.substring(0, groupSize))
-                leftover = next.substring(groupSize)
-            }
-
-            return result
-        } else {
-            return result.concat(next)
-        }
-    }, []).join('-')
+    return cleaned.slice(0, firstGroupLength) +
+        (cleaned.length > firstGroupLength ? '-' : '') +
+        cleaned.slice(firstGroupLength).match(regex)?.join('-') || ''
 }
 
 console.log(`Example 1: "5F3Z-2e-9-w" | Expected: "5F3Z-2E9W" | Result: ${licenseKeyFormatting1("5F3Z-2e-9-w", 4)}`)
 console.log(`Example 2: "2-5g-3-J" | Expected: "2-5G-3J" | Result: ${licenseKeyFormatting1("2-5g-3-J", 2)}`)
 
-//console.log(`Example 1: "5F3Z-2e-9-w" | Expected: "5F3Z-2E9W" | Result: ${licenseKeyFormatting2("5F3Z-2e-9-w", 4)}`)
-//console.log(`Example 2: "2-5g-3-J" | Expected: "2-5G-3J" | Result: ${licenseKeyFormatting2("2-5g-3-J", 2)}`)
+console.log(`Example 1: "5F3Z-2e-9-w" | Expected: "5F3Z-2E9W" | Result: ${licenseKeyFormatting2("5F3Z-2e-9-w", 4)}`)
+console.log(`Example 2: "2-5g-3-J" | Expected: "2-5G-3J" | Result: ${licenseKeyFormatting2("2-5g-3-J", 2)}`)
